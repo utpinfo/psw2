@@ -25,14 +25,14 @@ uci commit network
 ### 安装iStore商店
 ```shell
 opkg update
-wget -qO imm.sh https://cafe.cpolar.top/wkdaily/zero3/raw/branch/main/zero3/imm.sh && chmod +x imm.sh && ./imm.sh
+wget --no-check-certificate -qO imm.sh https://cafe.cpolar.top/wkdaily/zero3/raw/branch/main/zero3/imm.sh && chmod +x imm.sh && ./imm.sh
 is-opkg install luci-i18n-quickstart-zh-cn
 ```
 
 ### PASSWALL2 (https://github.com/xiaorouji/openwrt-passwall2/releases/expanded_assets/$VERSION)
 ```
 opkg update
-wget -q https://raw.githubusercontent.com/utpinfo/psw2/main/download.sh && chmod +x download.sh && ./download.sh
+wget --no-check-certificate -q https://raw.githubusercontent.com/utpinfo/psw2/main/download.sh && chmod +x download.sh && ./download.sh
 opkg install *.ipk --force-reinstall
 ```
 
@@ -50,7 +50,9 @@ https://help.mirrors.cernet.edu.cn/immortalwrt/
 
 ### 預安裝軟件包
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
-
+<!-- 23.x.x
+bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-base-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
+-->
 
 ###  首次启动时运行的脚本（uci-defaults）增加
 ```
@@ -70,9 +72,15 @@ uci set dhcp.lan.leasetime='6h'
 uci set network.wan6.disabled='1'
 uci set dhcp.lan.ra='disabled'
 uci set dhcp.lan.dhcpv6='disabled'
+#  關閉24.10版本預設流量卸載 (部分ISP 檢測封包格式異常或缺乏一些特徵, 導致限速)
+uci set firewall.@defaults[0].flow_offloading='0'
+uci set firewall.@defaults[0].flow_offloading_hw='0'
+# 關閉 fullcone NAT，改回傳統 NAT 模式
+uci set firewall.@defaults[0].fullcone='0'
 uci commit
 # /etc/init.d/network restart
 # /etc/init.d/odhcpd restart
+# /etc/init.d/firewall restart
 # 配置鏡像源
 sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
     -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
