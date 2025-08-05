@@ -5,7 +5,8 @@
 uci set network.wan.proto='pppoe'
 uci set network.wan.username='15618476128' 
 uci set network.wan.password='Rh19870128'
-uci set network.wan.ifname='eth0'
+uci add_list network.wan.dns='114.114.114.114'
+uci add_list network.wan.dns='8.8.8.8'
 uci commit network
 /etc/init.d/network restart
 ```
@@ -17,7 +18,6 @@ uci set network.wan.netmask='255.255.255.0'
 uci set network.wan.gateway='192.168.201.254'
 uci add_list network.wan.dns='114.114.114.114'
 uci add_list network.wan.dns='8.8.8.8'
-uci set network.wan.ifname='eth0'
 uci commit network
 /etc/init.d/network restart
 ```
@@ -50,9 +50,10 @@ https://help.mirrors.cernet.edu.cn/immortalwrt/
 
 ### 預安裝軟件包
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
-<!-- 23.x.x
+<!--
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-base-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
 -->
+
 
 ###  首次启动时运行的脚本（uci-defaults）增加
 ```
@@ -103,7 +104,7 @@ brew install qemu
 qemu-img convert -f raw -O vmdk istoreos-24.10.2-2025071110-x86-64-squashfs-combined-efi.img openwrt.vmdk
 # 上傳儲存區 (ESXI)
 cd /Users/yangfengkai/Downloads
-scp openwrt.vmdk root@192.168.201.210://vmfs/volumes/636ed8f8-89d1b6a0-d723-e0db550e08b4/openwrt
+scp openwrt.vmdk root@192.168.201.210://vmfs/volumes/636ed8f8-89d1b6a0-d723-e0db550e08b4/istoreos
 # EXSI上執行轉換 (vmdk -> esxi-vmdk)
 ssh root@192.168.201.210
 cd /vmfs/volumes/636ed8f8-89d1b6a0-d723-e0db550e08b4/openwrt
