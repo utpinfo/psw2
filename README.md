@@ -50,7 +50,7 @@ https://help.mirrors.cernet.edu.cn/immortalwrt/
 
 ### 預安裝軟件包
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
-<!--
+<!-- openwrt 23
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-base-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
 -->
 
