@@ -12,7 +12,7 @@
 
 version_latest=$(curl -s https://api.github.com/repos/xiaorouji/openwrt-passwall2/releases/latest | grep tag_name | cut -d'"' -f4)
 version="${1:-$version_latest}"
-
+echo "⬇️ version: ${version}"
 arch_os=$(grep 'OPENWRT_ARCH' /etc/os-release | cut -d'=' -f2 | tr -d '"')
 arch="${2:-$arch_os}"
 err=0
@@ -23,7 +23,12 @@ base_url="https://github.com/xiaorouji/openwrt-passwall2/releases/download/${ver
 mkdir -p "./${arch}"
 rm -rf "./${arch}"/*
 
-files=("luci-24.10_luci-app-passwall2" "luci-24.10_luci-i18n-passwall2-zh-cn" "passwall_packages_ipk_${arch}")
+
+files=(
+  "luci-app-passwall2_"
+  "luci-i18n-passwall2-zh-cn_"
+  "passwall_packages_ipk_${arch}"
+)
 
 for item in "${files[@]}"; do
   file=$(curl -s "$list_url" | grep -oE "[^/]*${item}[^/]*\.(ipk|zip)" | head -n 1)
