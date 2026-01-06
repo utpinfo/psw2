@@ -10,7 +10,7 @@
   exit 1
 }
 
-version_latest=$(curl -s https://api.github.com/repos/xiaorouji/openwrt-passwall2/releases/latest | grep tag_name | cut -d'"' -f4)
+version_latest=$(curl -s https://api.github.com/repositories/466781739/releases/latest | grep tag_name | cut -d'"' -f4)
 version="${1:-$version_latest}"
 
 arch_os=$(grep 'OPENWRT_ARCH' /etc/os-release | cut -d'=' -f2 | tr -d '"')
@@ -19,7 +19,7 @@ err=0
 
 list_url="https://github.com/xiaorouji/openwrt-passwall2/releases/expanded_assets/${version}/"
 base_url="https://github.com/xiaorouji/openwrt-passwall2/releases/download/${version}/"
-echo "⬇️ version: ${list_url}"
+echo "⬇️ url: ${list_url}"
 mkdir -p "./${arch}"
 rm -rf "./${arch}"/*
 
