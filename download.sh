@@ -32,6 +32,7 @@ files=(
 
 for item in "${files[@]}"; do
   file=$(curl -s "$list_url" | grep -oE "[^/]*${item}[^/]*\.(ipk|zip)" | head -n 1)
+  echo "⬇️ file: ${file}"
   [ -z "$file" ] && { echo "❌ 找不到檔案: ${item}"; ((err++)); continue; }
 
   download_url="${base_url}${file}"
