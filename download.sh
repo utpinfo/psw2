@@ -32,17 +32,17 @@ files=(
 
 for item in "${files[@]}"; do
   file=$(curl -s "$list_url" | grep -oE "[^/]*${item}[^/]*\.(ipk|zip)" | head -n 1)
-  echo "⬇️ file: ${file}"
+  echo "⬇️ 檔名: ${file}"
   [ -z "$file" ] && { echo "❌ 找不到檔案: ${item}"; ((err++)); continue; }
 
   download_url="${base_url}${file}"
   target_path="./${arch}/${file}"
 
-  echo "⬇️ 下載: $download_url"
+  echo "⬇️ 地址: $download_url"
   curl -sL -o "$target_path" "$download_url" || { echo "❌ 下載失敗: $file"; ((err++)); continue; }
   [ ! -s "$target_path" ] && { echo "❌ 檔案為空: $file"; ((err++)); continue; }
 
-  echo "✅ 下載完成: $file"
+  echo "✅ 完成: $file"
 
   [[ "$file" == *.zip ]] && {
     unzip -tq "$target_path" > /dev/null 2>&1 && unzip -q "$target_path" -d "./${arch}/" && echo "📦 解壓完成: $file" || echo "⚠️ 無效 ZIP: $file"
