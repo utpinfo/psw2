@@ -17,8 +17,8 @@ arch_os=$(grep 'OPENWRT_ARCH' /etc/os-release | cut -d'=' -f2 | tr -d '"')
 arch="${2:-$arch_os}"
 err=0
 
-list_url="https://github.com/xiaorouji/openwrt-passwall2/releases/expanded_assets/${version}/"
-base_url="https://github.com/xiaorouji/openwrt-passwall2/releases/download/${version}/"
+list_url="https://github.com/Openwrt-Passwall/openwrt-passwall2/releases/expanded_assets/${version}/"
+base_url="https://github.com/Openwrt-Passwall/openwrt-passwall2/releases/download/${version}/"
 echo "⬇️ url: ${list_url}"
 mkdir -p "./${arch}"
 rm -rf "./${arch}"/*
