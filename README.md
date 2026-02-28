@@ -121,6 +121,9 @@ sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immort
 
 # 丟包檢查
 cat /proc/net/softnet_stat
+# 增大 backlog
+echo 3 > /sys/class/net/eth0/queues/rx-*/rps_cpus
+sysctl -w net.core.netdev_max_backlog=8192
 ```
 
 
