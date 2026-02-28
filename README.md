@@ -1,4 +1,5 @@
 ## 首次使用
+
 ### 配置網路介面 (/etc/config/network)
 - 配置PPPOE
 ```
@@ -36,6 +37,94 @@ wget --no-check-certificate -q https://raw.githubusercontent.com/utpinfo/psw2/ma
 opkg install *.ipk --force-reinstall
 ```
 
+### 安裝軟件包 (如果使用訂製包則略過)
+```
+opkg install bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
+```
+
+
+************************************************************************************************************************************************************
+###  首次启动时运行的脚本（uci-defaults）增加 (version: 25.10.5)
+```shell
+#!/bin/sh
+# ===============================
+# ImmortalWrt R5C 4GB 高並發極限優化
+# ===============================
+
+# 1️⃣ 系統日誌
+uci set system.@system[0].conloglevel='4'
+uci set system.@system[0].cronloglevel='9'
+
+# 2️⃣ LAN & DHCP
+uci set network.lan.ipaddr='192.168.100.1'
+uci set network.lan.netmask='255.255.255.0'
+uci set dhcp.lan=dhcp
+uci set dhcp.lan.interface='lan'
+uci set dhcp.lan.start='100'
+uci set dhcp.lan.limit='50'
+uci set dhcp.lan.leasetime='6h'
+
+# 3️⃣ Conntrack（高並發 NAT）
+sysctl -w net.netfilter.nf_conntrack_max=524288
+echo "net.netfilter.nf_conntrack_max=524288" >> /etc/sysctl.conf
+echo "net.netfilter.nf_conntrack_tcp_timeout_established=3600" >> /etc/sysctl.conf
+echo "net.netfilter.nf_conntrack_tcp_timeout_time_wait=120" >> /etc/sysctl.conf
+echo "net.netfilter.nf_conntrack_udp_timeout=60" >> /etc/sysctl.conf
+echo "net.netfilter.nf_conntrack_udp_timeout_stream=180" >> /etc/sysctl.conf
+sysctl -p
+
+# 4️⃣ IRQ Balance + Packet Steering
+opkg update
+opkg install irqbalance
+/etc/init.d/irqbalance enable
+/etc/init.d/irqbalance start
+uci set network.globals.packet_steering='1'
+uci commit network
+/etc/init.d/firewall restart
+
+# 5️⃣ IPv6 / WAN6 禁用
+uci set network.wan6.disabled='1'
+uci set dhcp.lan.ra='disabled'
+uci set dhcp.lan.dhcpv6='disabled'
+uci commit network
+
+# 6️⃣ Flow Offload / NAT
+uci set firewall.@defaults[0].flow_offloading='0'
+uci set firewall.@defaults[0].flow_offloading_hw='0'
+uci set firewall.@defaults[0].fullcone='0'
+uci commit firewall
+/etc/init.d/firewall restart
+
+# 7️⃣ 網卡 RPS + Softnet / TCP Buffer 極限優化
+# 修改 eth0 / eth1 根據實際 WAN/LAN
+for IF in eth0 eth1; do
+    echo ffffffff > /sys/class/net/$IF/queues/rx-0/rps_cpus
+done
+
+echo 32768 > /proc/sys/net/core/rps_sock_flow_entries
+echo 65536 > /proc/sys/net/core/netdev_max_backlog
+echo 67108864 > /proc/sys/net/core/rmem_max
+echo 67108864 > /proc/sys/net/core/wmem_max
+echo 3 > /proc/sys/net/ipv4/tcp_fastopen
+echo bbr > /proc/sys/net/ipv4/tcp_congestion_control
+echo 1 > /proc/sys/net/ipv4/tcp_mtu_probing
+
+# 8️⃣ 配置鏡像源
+sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
+    -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
+    -i.bak /etc/opkg/distfeeds.conf
+
+# 9️⃣ 重啟必要服務
+/etc/init.d/network restart
+/etc/init.d/odhcpd restart
+/etc/init.d/firewall restart
+
+# 丟包檢查
+cat /proc/net/softnet_stat
+```
+
+
+
 ************************************************************************************************************************************************************
 ## 訂製固件
 
@@ -50,43 +139,8 @@ https://help.mirrors.cernet.edu.cn/immortalwrt/
 
 ### 預安裝軟件包
 bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
-<!-- openwrt 23
-bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-base-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
--->
 
 
-###  首次启动时运行的脚本（uci-defaults）增加
-```
-# 日誌等級
-uci set system.@system[0].conloglevel='4'
-uci set system.@system[0].cronloglevel='9'
-# 配置LAN (等效: 網路 > 接口 > lan)
-uci set network.lan.ipaddr='192.168.100.1'
-uci set network.lan.netmask='255.255.255.0'
-# 配置 DHCP
-uci set dhcp.lan=dhcp
-uci set dhcp.lan.interface='lan'
-uci set dhcp.lan.start='100'
-uci set dhcp.lan.limit='50'
-uci set dhcp.lan.leasetime='6h'
-# 禁用 wan6
-uci set network.wan6.disabled='1'
-uci set dhcp.lan.ra='disabled'
-uci set dhcp.lan.dhcpv6='disabled'
-#  關閉24.10版本預設流量卸載 (部分ISP 檢測封包格式異常或缺乏一些特徵, 導致限速)
-uci set firewall.@defaults[0].flow_offloading='0'
-uci set firewall.@defaults[0].flow_offloading_hw='0'
-# 關閉 fullcone NAT，改回傳統 NAT 模式
-uci set firewall.@defaults[0].fullcone='0'
-uci commit
-# /etc/init.d/network restart
-# /etc/init.d/odhcpd restart
-# /etc/init.d/firewall restart
-# 配置鏡像源
-sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
-    -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
-    -i.bak /etc/opkg/distfeeds.conf
-```
 
 ## 安裝插件 (第三方)
 ```text
@@ -94,7 +148,7 @@ sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immort
 # 網路嚮導 (https://github.com/sirpdboy/luci-app-netwizard/releases/expanded_assets/v1.9.2)
 ```
 
-
+************************************************************************************************************************************************************
 
 ## ESXI VMDK 製作 (二次轉換)   
 ```shell
