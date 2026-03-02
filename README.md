@@ -13,12 +13,12 @@ uci commit network
 ```
 - 配置二級路由
 ```
-uci set network.wan.proto='static'
-uci set network.wan.ipaddr='192.168.201.190'
-uci set network.wan.netmask='255.255.255.0'
-uci set network.wan.gateway='192.168.201.254'
-uci add_list network.wan.dns='114.114.114.114'
-uci add_list network.wan.dns='8.8.8.8'
+uci set network.lan.proto='static'
+uci set network.lan.ipaddr='192.168.201.190'
+uci set network.lan.netmask='255.255.255.0'
+uci set network.lan.gateway='192.168.201.254'
+uci add_list network.lan.dns='114.114.114.114'
+uci add_list network.lan.dns='8.8.8.8'
 uci commit network
 /etc/init.d/network restart
 ```
