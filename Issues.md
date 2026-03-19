@@ -26,17 +26,22 @@ nft list table inet passwall2 | grep -E '192\.168|passwall2_lan'
 -->
 
 # DNS配置
-## 方案一 (DNS入口: passwall2, 直連流入dnsmasq)
-1. DNS 重定向: true
 
+## * 方案一 (DNS入口: passwall2, 直連流入mosdns)
+1. passwall2 => 远程 DNS 协议: DOH
+2. passwall2 => 远程 DNS: cloudflare
+3. passwall2 => DNS 重定向: true
+4. mosdns => DNS 轉發: true
+5. mosdns => DNS 重定向: false
 
 ## 方案二 (DNS入口: mosdns, 由mosdns處理後再入passwall2 -> 多DNS備選):
-1. passwall2, DNS 重定向: false
-2. mosdns, DNS 轉發: true
-3. mosdns, DNS 重定向: true
+1. passwall2 => 远程 DNS 协议: UDP
+2. passwall2 => 远程 DNS: 127.0.0.1:5335
+3. passwall2 => DNS 重定向: false
+4. mosdns => DNS 轉發: true
+5. mosdns => DNS 重定向: true
 
-
-## 方案三 (DNS入口: mosdns, 由mosdns處理後再入passwall2 -> 多DNS備選):
-1. passwall2, DNS 重定向: false
-2. mosdns, DNS 轉發: true
-3. mosdns, DNS 重定向: true
+## 方案三 (DNS入口: passwall2, 直連流入dnsmasq)
+1. passwall2 => 远程 DNS 协议: DOH
+2. passwall2 => 远程 DNS: cloudflare
+3. passwall2 => DNS 重定向: true
