@@ -53,3 +53,9 @@ nft list table inet passwall2 | grep -E '192\.168|passwall2_lan'
 ├── 国内域名: 客户端 → MosDNS(国内DNS) → 返回
 └── 国外域名: 客户端 → MosDNS(远程DNS) → Passwall2 → Xray → 返回
 -->
+
+
+## * 特殊規則
+```
+The geosite:cn rule must come after the geosite:proxy rule,otherwise www.gstatic.com gets matched by cn and goes direct (which is broken in China).
+```
