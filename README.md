@@ -127,8 +127,22 @@ uci commit firewall
 
 # 7️⃣ 網卡 RPS + Softnet / TCP Buffer 極限優化
 # 修改 eth0 / eth1 根據實際 WAN/LAN
-for IF in eth0 eth1; do
-    printf '%x\n' $(( (1 << $(grep -c ^processor /proc/cpuinfo)) - 1 )) > /sys/class/net/$IF/queues/rx-0/rps_cpus
+CPU=$(grep -c '^processor' /proc/cpuinfo)
+
+MASK=0
+i=0
+while [ $i -lt $CPU ]; do
+    MASK=$((MASK | (1 << i)))
+    i=$((i + 1))
+done
+
+for IF in eth0 eth1 br-lan; do
+    [ -d /sys/class/net/$IF ] || continue
+
+    for RXQ in /sys/class/net/$IF/queues/rx-*; do
+        [ -w "$RXQ/rps_cpus" ] || continue
+        echo $MASK > "$RXQ/rps_cpus" 2>/dev/null
+    done
 done
 
 echo 32768 > /proc/sys/net/core/rps_sock_flow_entries
