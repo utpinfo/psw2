@@ -65,12 +65,42 @@ uci set dhcp.lan.limit='50'
 uci set dhcp.lan.leasetime='6h'
 
 # 3️⃣ Conntrack（高並發 NAT）
-sysctl -w net.netfilter.nf_conntrack_max=524288
-echo "net.netfilter.nf_conntrack_max=524288" >> /etc/sysctl.conf
-echo "net.netfilter.nf_conntrack_tcp_timeout_established=3600" >> /etc/sysctl.conf
-echo "net.netfilter.nf_conntrack_tcp_timeout_time_wait=120" >> /etc/sysctl.conf
-echo "net.netfilter.nf_conntrack_udp_timeout=60" >> /etc/sysctl.conf
-echo "net.netfilter.nf_conntrack_udp_timeout_stream=180" >> /etc/sysctl.conf
+cat <<'EOF' > /etc/sysctl.conf
+# Conntrack
+net.netfilter.nf_conntrack_max = 524288
+net.netfilter.nf_conntrack_tcp_timeout_established = 3600
+net.netfilter.nf_conntrack_tcp_timeout_time_wait = 120
+net.netfilter.nf_conntrack_udp_timeout = 60
+net.netfilter.nf_conntrack_udp_timeout_stream = 180
+# TCP 基礎性能（吞吐 + 穩定）
+net.core.default_qdisc = fq_codel
+net.ipv4.tcp_congestion_control = bbr
+# Socket buffer（高吞吐核心）
+net.core.rmem_max = 33554432
+net.core.wmem_max = 33554432
+net.core.rmem_default = 262144
+net.core.wmem_default = 262144
+net.ipv4.tcp_rmem = 4096 87380 33554432
+net.ipv4.tcp_wmem = 4096 65536 33554432
+# 網路佇列（抗爆流量 / Cloudflare / HTTP2）
+net.core.netdev_max_backlog = 16384
+net.core.somaxconn = 8192
+net.ipv4.tcp_max_syn_backlog = 8192
+# TIME_WAIT / NAT 壓力優化
+net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_tw_reuse = 1
+# Keepalive（VPN / Xray / Reality 穩定）
+net.ipv4.tcp_keepalive_time = 600
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_keepalive_probes = 5
+# 安全 + 穩定
+net.ipv4.tcp_syncookies = 1
+# MTU / Path control（避免 UDP / VPN 卡死）
+net.ipv4.ip_no_pmtu_disc = 0
+# 軟中斷優化（高流量才有感）
+net.core.netdev_budget = 600
+net.core.netdev_budget_usecs = 8000
+EOF
 sysctl -p
 
 # 4️⃣ IRQ Balance + Packet Steering
