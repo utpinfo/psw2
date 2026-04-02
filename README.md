@@ -23,13 +23,6 @@ uci commit network
 /etc/init.d/network restart
 ```
 
-### 安装iStore商店
-```shell
-opkg update
-wget --no-check-certificate -qO imm.sh https://cafe.cpolar.top/wkdaily/zero3/raw/branch/main/zero3/imm.sh && chmod +x imm.sh && ./imm.sh
-is-opkg install luci-i18n-quickstart-zh-cn
-```
-
 ### PASSWALL2 (https://github.com/xiaorouji/openwrt-passwall2/releases/expanded_assets/$VERSION)
 ```
 opkg update
@@ -41,6 +34,14 @@ opkg install *.ipk --force-reinstall
 ```
 opkg install bash tree curl unzip zoneinfo-asia netdata luci-app-netdata luci-i18n-netdata-zh-cn luci-i18n-firewall-zh-cn luci-i18n-filebrowser-zh-cn luci-app-argon-config luci-i18n-argon-config-zh-cn luci-i18n-package-manager-zh-cn luci-i18n-ttyd-zh-cn openssh-sftp-server kmod-nft-socket kmod-nft-tproxy kmod-tcp-bbr
 ```
+<!--
+### 安装iStore商店
+```shell
+opkg update
+wget --no-check-certificate -qO imm.sh https://cafe.cpolar.top/wkdaily/zero3/raw/branch/main/zero3/imm.sh && chmod +x imm.sh && ./imm.sh
+is-opkg install luci-i18n-quickstart-zh-cn
+```
+-->
 
 
 ************************************************************************************************************************************************************
@@ -100,6 +101,10 @@ net.ipv4.ip_no_pmtu_disc = 0
 # 軟中斷優化（高流量才有感）
 net.core.netdev_budget = 600
 net.core.netdev_budget_usecs = 8000
+# Others
+net.core.rps_sock_flow_entries=32768
+net.ipv4.tcp_fastopen=3
+net.ipv4.tcp_mtu_probing=1
 EOF
 sysctl -p
 
@@ -144,14 +149,6 @@ for IF in eth0 eth1 br-lan; do
         echo $MASK > "$RXQ/rps_cpus" 2>/dev/null
     done
 done
-
-echo 32768 > /proc/sys/net/core/rps_sock_flow_entries
-echo 65536 > /proc/sys/net/core/netdev_max_backlog
-echo 67108864 > /proc/sys/net/core/rmem_max
-echo 67108864 > /proc/sys/net/core/wmem_max
-echo 3 > /proc/sys/net/ipv4/tcp_fastopen
-echo bbr > /proc/sys/net/ipv4/tcp_congestion_control
-echo 1 > /proc/sys/net/ipv4/tcp_mtu_probing
 
 # 8️⃣ 配置鏡像源
 sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
