@@ -66,7 +66,7 @@ uci set dhcp.lan.limit='50'
 uci set dhcp.lan.leasetime='6h'
 
 # 3️⃣ Conntrack（高並發 NAT）
-cat <<'EOF' > /etc/sysctl.conf
+cat <<'EOF' > /etc/sysctl.d/99-r5c.conf
 # Conntrack
 net.netfilter.nf_conntrack_max = 524288
 net.netfilter.nf_conntrack_tcp_timeout_established = 3600
@@ -106,7 +106,6 @@ net.core.rps_sock_flow_entries=32768
 net.ipv4.tcp_fastopen=3
 net.ipv4.tcp_mtu_probing=1
 EOF
-sysctl -p
 
 # 4️⃣ IRQ Balance + Packet Steering
 opkg update
