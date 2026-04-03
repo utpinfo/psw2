@@ -25,6 +25,13 @@ nft list table inet passwall2 | grep -E '192\.168|passwall2_lan'
 ```
 -->
 
+# Safari關閉H3
+```shell
+defaults write com.apple.Safari Http3Enabled -bool false
+defaults read com.apple.Safari Http3Enabled # 查看H3設置
+```
+
+
 # DNS配置
 
 ## * 方案一 (DNS入口: passwall2, 直連流入mosdns)
