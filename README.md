@@ -149,6 +149,10 @@ for IF in eth0 eth1 br-lan; do
     done
 done
 
+for i in /sys/class/net/eth0/queues/tx-*; do
+  echo f > $i/xps_cpus
+done
+
 # 8️⃣ 配置鏡像源
 sed -e 's,https://downloads.immortalwrt.org,https://mirrors.cernet.edu.cn/immortalwrt,g' \
     -e 's,https://mirrors.vsean.net/openwrt,https://mirrors.cernet.edu.cn/immortalwrt,g' \
