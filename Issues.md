@@ -15,7 +15,7 @@
 ## 方案三
 ```shell
 # 局域網IP規則註解處理
-sed -i '/192\.168\.0\.0\/16/ s/^[[:space:]]*/&#/' /usr/share/passwall2/utils.sh
+sed -i '/192\.168\.0\.0\/16/ s/^/#/' /usr/share/passwall2/utils.sh
 # 局域網IP規則復原
 sed -i 's/^[[:space:]]*#\(.*192\.168\.0\.0\/16.*\)/\1/' /usr/share/passwall2/utils.sh
 # 檢測規則
@@ -24,6 +24,12 @@ grep '192\.168\.0\.0/16' /usr/share/passwall2/utils.sh
 nft list table inet passwall2 | grep -E '192\.168|passwall2_lan'
 ```
 -->
+## 屏蔽私密轉送(iCloud Private Delay), 導致QUIC無法攔截
+- https://support.apple.com/zh-tw/guide/mac-help/mchlecadabe0/26/mac/26
+- 目前已知Safari訪問yahoo會出現問題
+- 方案一: 新增規則阻止(geosite:icloudprivaterelay)
+- 方案二: wifi關閉Limit IP address tracking
+```
 
 # DNS配置
 
