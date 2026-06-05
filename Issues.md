@@ -65,3 +65,16 @@ nft list table inet passwall2 | grep -E '192\.168|passwall2_lan'
 ```
 The geosite:cn rule must come after the geosite:proxy rule,otherwise www.gstatic.com gets matched by cn and goes direct (which is broken in China).
 ```
+
+
+# VPS 局域網訪問
+```
+# 服務端
+1. 規則管理
+Routing Rules > geosite:private
+2. 配置finalRules (Freedom的)
+Outbounds > direct (freedom) > IP / CIDR / geoip: 192.168.70.0/24, 192.168.201.0/24
+
+# 客戶端
+1. Shadowrocket > Tunnel > Include All Networks
+```
