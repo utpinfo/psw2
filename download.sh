@@ -27,7 +27,7 @@ rm -rf "./${arch}"/*
 files=(
   "luci-app-passwall2_"
   "luci-i18n-passwall2-zh-cn_"
-  "passwall_packages_ipk_${arch}"
+  "packages_ipk_${arch}"
 )
 
 for item in "${files[@]}"; do
